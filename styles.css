@@ -1,0 +1,45 @@
+* {
+    font-family: 'Inter', sans-serif;
+}
+
+#container {
+    flex-wrap: wrap;
+    display: flex;
+    position: relative;
+}
+
+#canvas {
+    height: 95vh;
+    width: 95vh;
+    margin-top: 2.5vh;
+    margin-left: 2vw;
+    flex-wrap: wrap;
+    position: relative;
+    display: flex;
+    border: 2px solid black;
+    border-left: 1px solid black;
+    border-top: 1px solid black;
+}
+
+#canvas div {
+    height: calc(4.75vh - 1px);
+    width: calc(4.75vh - 1px);
+    border-left: 1px solid black;
+    border-top: 1px solid black;
+}
+
+#option {
+    display: block;
+}
+
+.red {
+    background-color: red;
+}
+
+.blue {
+    background-color: blue;
+}
+
+.blank {
+    background-color: white;
+}
