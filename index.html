@@ -3,27 +3,34 @@
 <html>
     <head>
         <meta charset="utf-8">
-        <script src="labyrinth_solver.js" charset="utf-8" defer></script>
+        <script src="pathfinder.js" charset="utf-8" defer></script>
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300&display=swap" rel="stylesheet">
         <link rel="stylesheet" href="styles.css">
         <title>pathfinder</title>
     </head>
     <body>
-        <div id="container">
-            <div id="options">
-                <h1>PATHFINDER</h1>
-                <input type="range" id="size">
+        <div id="options">
+            <h1>PATHFINDER</h1>
+            <p>
+                <input class="button" id="size" type="number" placeholder="size">
+            </p>
+            <p>
+                <button class="button" id="start">place start</button>
+            </p>
+            <p>
+                <button class="button" id="goal">place goal</button>
+            </p>
+            <p>
                 <select name="Search Algorithm" id="search">
                     <option value="">Search Algorithm</option>
-                    <option value="right">hold right</option>
-                    <option value="left">hold left</option>
-                    <option value="dijkstra">dijkstra</option>
-                    <option value="a*">a-star</option>
+                    <option value="dfs">dfs</option>
+                    <option value="bfs">bfs</option>
                 </select>
-                <button id="generate">generate</button>
-                <button id="clear">clear</button>
-            </div>
-            <div id="canvas"></div>
+            </p>
+            <p>
+                <button class="button" id="calculate">calculate path</button>
+            </p>
         </div>
+        <div id="canvas"></div>
     </body>
 </html>
