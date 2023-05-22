@@ -1,11 +1,20 @@
+
+/*           TO DO:
+    - add maze generation?
+*/
+
+// initiate variables and constants
 const canvas = document.querySelector('#canvas')
-const calculateButton = document.querySelector('#calculate')
+const bfsButton = document.querySelector('#bfs')
+const dfsButton = document.querySelector('#dfs')
 const goalButton = document.querySelector('#goal')
-const searchInput = document.querySelector('#search')
 const sizeInput = document.querySelector('#size')
 const startButton = document.querySelector('#start')
+const recolourEventCallbacks = []
+const removeEventCallbacks = []
 
-let board
+let adjacencyMatrix = []
+let board = []
 let goal
 let goalPlaced = false
 let overwrite = false
@@ -18,6 +27,7 @@ let type = 1
 setup()
 
 function setup() {
+    // set up buttons and their validities
     sizeInput.addEventListener('change', () => {
         size = sizeInput.value
         sizeSquared = size ** 2
@@ -36,94 +46,130 @@ function setup() {
         }
     })
 
-    calculateButton.addEventListener('click', () => { 
-        if (startPlaced == true && goalPlaced == true || searchInput.value != '') {
-            calculate(searchInput.value)
+    dfsButton.addEventListener('click', () => { 
+        if (startPlaced == true && goalPlaced == true) {
+            calculate('dfs')
+        }
+    })
+
+    bfsButton.addEventListener('click', () => { 
+        if (startPlaced == true && goalPlaced == true) {
+            calculate('bfs')
         }
     })
 }
 
 function reset() {
+    board = []
+    goalPlaced = false
+    overwrite = true
+    size = parseInt(sizeInput.value)
+    sizeSquared = size ** 2
+    startPlaced = false
+
+    // if the board is being overwritten, clear the canvas
     if (overwrite == true) {
         canvas.innerHTML = ''
     }
 
-    size = parseInt(sizeInput.value)
-    board = Array(size).fill(Array(size).fill(0))
+    // create the board
+    for (let i = 0; i < size; i++) {
+        board[i] = []
+
+        for (let j = 0; j < size; j++) {
+            board[i][j] = 0
+        }
+    }
     
+    // create the squares on the canvas
     for (let i = 0; i < size ** 2; i++) {
         const square = document.createElement('div')
-        square.setAttribute('class', `squares`)
         square.setAttribute('id', `square${i}`)
         square.setAttribute('onmouseover', "this.style.cursor='pointer'")
         square.setAttribute('onmouseout', "this.style.cursor='default'")
-        square.addEventListener("click", recolour.bind(null, i), false)
         square.style.height = `calc(${92.5 / size}vh - 1px)`;
         square.style.width = `calc(${92.5 / size}vh - 1px)`;
+        recolourEventCallbacks[i] = recolour.bind(null, i);
+        square.addEventListener("click", recolourEventCallbacks[i], false)
         canvas.appendChild(square)
     }
-
-    goalPlaced = false
-    overwrite = true
-    startPlaced = false
 }
 
 function recolour(index) {
-    console.log(board)
-
+    // working with html classes to change the colour of the squares
     const square = document.querySelector(`#square${index}`)
-    square.classList.remove('blank')
+    square.className = ''
 
-    if (type == 1) {
-        square.classList.add('gray')
+    switch (type) {
+        case 1:
+            // if square is clicked normally, set to wall=
+            square.classList.add('gray')
+            board[Math.floor(index / size)][index % size] = 1
+            break;
+
+        // if square is clicked while start or goal is selected, set to start or goal
+        case 2:
+            start = index
+            startPlaced = true
+            board[Math.floor(index / size)][index % size] = 2
+            square.classList.add('red')
+            startButton.style.backgroundColor = 'rgb(193, 195, 206)';
+            break;
+
+        case 3:
+            goal = index
+            goalPlaced = true
+            board[Math.floor(index / size)][index % size] = 3
+            square.classList.add('blue')
+            goalButton.style.backgroundColor = 'rgb(193, 195, 206)';
+            break;
     }
 
-    else if (type == 2) {
-        start = index
-        startPlaced = true
-        square.classList.add('red')
-        startButton.style.backgroundColor = 'rgb(193, 195, 206)';
-    }   
-
-    else if (type == 3) {
-        goal = index
-        goalPlaced = true
-        square.classList.add('blue')
-        goalButton.style.backgroundColor = 'rgb(193, 195, 206)';
-    }
-
-    square.addEventListener('click', () => {
-        square.removeEventListener("click", recolour.bind(null, index), false);
-
-        if (square.classList.contains('red')) {
-            startPlaced = false
-            startButton.style.backgroundColor = 'rgb(255, 255, 255)';
-        }
-
-        else if (square.classList.contains('blue')) {
-            goalPlaced = false
-            goalButton.style.backgroundColor = 'rgb(255, 255, 255)';
-        }
-        
-        square.className = ''
-        square.classList.add('blank')
-        board[Math.floor(index / size)][index % size] = 0
-        square.addEventListener("click", recolour.bind(null, index), false);
-    }, {once: true})
-
-    board[Math.floor(index / size)][index % size] = type
+    removeEventCallbacks[index] = remove.bind(null, square);
+    square.addEventListener("click", removeEventCallbacks[index], false)
+    square.removeEventListener("click", recolourEventCallbacks[index], false);
+    
     type = 1
 }
 
+function remove(square) {
+    // remove the square from the board
+    const index = parseInt(square.id.slice(6))
+
+    if (square.classList.contains('red')) {
+        startPlaced = false
+        startButton.style.backgroundColor = 'rgb(255, 255, 255)';
+    }
+
+    else if (square.classList.contains('blue')) {
+        goalPlaced = false
+        goalButton.style.backgroundColor = 'rgb(255, 255, 255)';
+    }
+
+    board[Math.floor(index / size)][index % size] = 0
+    recolourEventCallbacks[index] = recolour.bind(null, index);
+    square.addEventListener("click", recolourEventCallbacks[index], false)
+    square.removeEventListener("click", removeEventCallbacks[index], false);
+    square.className = ''
+}
+
 function calculate(algorithm) {
-    let adjacencyMatrix = Array(sizeSquared).fill(Array(sizeSquared).fill(0))
-    goalPlaced = false
-    startPlaced = false
+    adjacencyMatrix = []
+
+    // create the adjacency matrix
+    for (let i = 0; i < size ** 2; i++) {
+        adjacencyMatrix[i] = []
+
+        for (let j = 0; j < size ** 2; j++) {
+            adjacencyMatrix[i][j] = 0
+        }
+    }
 
     for (let y = 0; y < size; y++) {
         for (let x = 0; x < size; x++) {
             document.querySelector(`#square${y * size + x}`).classList.remove('green')
 
+            // check for adjacent squares in all directions and add to adjacency matrix
             if (board[y][x] != 1) {
                 if (x != 0 && board[y][x - 1] != 1) {
                     adjacencyMatrix[y * size + x][y * size + x - 1] = 1
@@ -150,10 +196,7 @@ function calculate(algorithm) {
         }
     }
 
-    console.log(start)
-    console.log(goal)
-    console.log(board)
-
+    // run chosen algorithm
     switch (algorithm) {
         case 'dfs':
             dfs_bfs('dfs', adjacencyMatrix)
@@ -165,7 +208,9 @@ function calculate(algorithm) {
     }
 }
 
+// depth first search and breadth first search combined for simplicity
 function dfs_bfs(computeOrder, adjacencyMatrix) {
+    // initialise variables and arrays
     let current
     let path = []
     let stackOrQueue = []
@@ -178,6 +223,7 @@ function dfs_bfs(computeOrder, adjacencyMatrix) {
     stackOrQueue.push(start)
     visited[start] = true
 
+    // different order of computation depending on algorithm
     while (stackOrQueue.length != 0) {
         switch (computeOrder) {
             case 'dfs':
@@ -189,13 +235,19 @@ function dfs_bfs(computeOrder, adjacencyMatrix) {
                 break
         }
         
+        // add to path and check if goal has been reached
         path.push(current)
-        document.querySelector(`#square${current}`).classList.add('green')
 
         if (current == goal) {
             break
         }
 
+        // visualise the path
+        else if (current != start) {
+            document.querySelector(`#square${current}`).classList.add('green')
+        }
+
+        // add adjacent squares to stack or queue
         for (let i = 0; i < size ** 2; i++) {
             if (adjacencyMatrix[current][i] == 1 && visited[i] == false) {
                 stackOrQueue.push(i)
