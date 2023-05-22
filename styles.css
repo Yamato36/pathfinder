@@ -7,6 +7,10 @@ body {
     display: flex;
 }
 
+#options {
+    margin-right: 10vw;
+}
+
 #canvas {
     height: 92.5vh;
     width: 92.5vh;
@@ -23,10 +27,6 @@ body {
 #canvas div {
     border-left: 1px solid black;
     border-top: 1px solid black;
-}
-
-#options {
-    margin-right: 10vw;
 }
 
 .red {
