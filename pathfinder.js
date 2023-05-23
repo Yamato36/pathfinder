@@ -1,8 +1,3 @@
-
-/*           TO DO:
-    - add maze generation?
-*/
-
 // initiate variables and constants
 const canvas = document.querySelector('#canvas')
 const bfsButton = document.querySelector('#bfs')
@@ -13,64 +8,37 @@ const startButton = document.querySelector('#start')
 const recolourEventCallbacks = []
 const removeEventCallbacks = []
 
+const algorithmFunctions = {
+    'dfs': (stackOrQueue) => stackOrQueue.pop(),
+    'bfs': (stackOrQueue) => stackOrQueue.shift()
+}
+
+const checks = [
+    (x, y) => x != 0 && board[y][x - 1] != 1,
+    (x, y) => x != size - 1 && board[y][x + 1] != 1,
+    (x, y) => y != size - 1 && board[y + 1][x] != 1,
+    (x, y) => y != 0 && board[y - 1][x] != 1
+]
+
 let adjacencyMatrix = []
+let algorithm
 let board = []
 let goal
 let goalPlaced = false
-let overwrite = false
 let size
 let sizeSquared
 let start
 let startPlaced = false
 let type = 1
 
-setup()
-
-function setup() {
-    // set up buttons and their validities
-    sizeInput.addEventListener('change', () => {
-        size = sizeInput.value
-        sizeSquared = size ** 2
-        reset()
-    })
-
-    startButton.addEventListener('click', () => {
-        if (startPlaced == false) {
-            type = 2
-        }
-    })
-
-    goalButton.addEventListener('click', () => { 
-        if (goalPlaced == false) {
-            type = 3
-        }
-    })
-
-    dfsButton.addEventListener('click', () => { 
-        if (startPlaced == true && goalPlaced == true) {
-            calculate('dfs')
-        }
-    })
-
-    bfsButton.addEventListener('click', () => { 
-        if (startPlaced == true && goalPlaced == true) {
-            calculate('bfs')
-        }
-    })
-}
-
-function reset() {
+// set up buttons and their validities
+sizeInput.addEventListener('change', () => {
     board = []
     goalPlaced = false
-    overwrite = true
     size = parseInt(sizeInput.value)
     sizeSquared = size ** 2
     startPlaced = false
-
-    // if the board is being overwritten, clear the canvas
-    if (overwrite == true) {
-        canvas.innerHTML = ''
-    }
+    canvas.innerHTML = ''
 
     // create the board
     for (let i = 0; i < size; i++) {
@@ -78,83 +46,110 @@ function reset() {
 
         for (let j = 0; j < size; j++) {
             board[i][j] = 0
+
+            k = i * size + j
+            // create the squares on the canvas
+            const square = document.createElement('div')
+            recolourEventCallbacks[k] = recolour.bind(null, k)
+            square.addEventListener("click", recolourEventCallbacks[k], false)
+            square.setAttribute('id', `square${k}`)
+            square.setAttribute('onmouseover', "this.style.cursor='pointer'")
+            square.setAttribute('onmouseout', "this.style.cursor='default'")
+            square.style.height = `calc(${92.5 / size}vh - 1px)`
+            square.style.width = `calc(${92.5 / size}vh - 1px)`
+            canvas.appendChild(square)
         }
     }
-    
-    // create the squares on the canvas
-    for (let i = 0; i < size ** 2; i++) {
-        const square = document.createElement('div')
-        square.setAttribute('id', `square${i}`)
-        square.setAttribute('onmouseover', "this.style.cursor='pointer'")
-        square.setAttribute('onmouseout', "this.style.cursor='default'")
-        square.style.height = `calc(${92.5 / size}vh - 1px)`;
-        square.style.width = `calc(${92.5 / size}vh - 1px)`;
-        recolourEventCallbacks[i] = recolour.bind(null, i);
-        square.addEventListener("click", recolourEventCallbacks[i], false)
-        canvas.appendChild(square)
+
+    startButton.style.backgroundColor = 'rgb(42, 42, 42)'
+    goalButton.style.backgroundColor = 'rgb(42, 42, 42)'
+})
+
+startButton.addEventListener('click', () => {
+    if (startPlaced == false) {
+        type = 2
     }
-}
+})
+
+goalButton.addEventListener('click', () => { 
+    if (goalPlaced == false) {
+        type = 3
+    }
+})
+
+dfsButton.addEventListener('click', () => { 
+    if (startPlaced == true && goalPlaced == true) {
+        algorithm = 'dfs'
+        calculate()
+    }
+})
+
+bfsButton.addEventListener('click', () => { 
+    if (startPlaced == true && goalPlaced == true) {
+        algorithm = 'bfs'
+        calculate()
+    }
+})
 
 function recolour(index) {
     // working with html classes to change the colour of the squares
     const square = document.querySelector(`#square${index}`)
+    board[Math.floor(index / size)][index % size] = type
+    removeEventCallbacks[index] = remove.bind(null, square)
+    square.addEventListener("click", removeEventCallbacks[index], false)
+    square.removeEventListener("click", recolourEventCallbacks[index], false)
     square.className = ''
-
+    
+    // set the square to type
     switch (type) {
         case 1:
-            // if square is clicked normally, set to wall=
             square.classList.add('gray')
-            board[Math.floor(index / size)][index % size] = 1
             break;
 
-        // if square is clicked while start or goal is selected, set to start or goal
         case 2:
             start = index
             startPlaced = true
-            board[Math.floor(index / size)][index % size] = 2
             square.classList.add('red')
-            startButton.style.backgroundColor = 'rgb(193, 195, 206)';
+            startButton.style.backgroundColor = 'rgb(69, 69, 69)'
             break;
 
         case 3:
             goal = index
             goalPlaced = true
-            board[Math.floor(index / size)][index % size] = 3
             square.classList.add('blue')
-            goalButton.style.backgroundColor = 'rgb(193, 195, 206)';
+            goalButton.style.backgroundColor = 'rgb(69, 69, 69)'
             break;
     }
 
-    removeEventCallbacks[index] = remove.bind(null, square);
-    square.addEventListener("click", removeEventCallbacks[index], false)
-    square.removeEventListener("click", recolourEventCallbacks[index], false);
-    
     type = 1
 }
 
 function remove(square) {
     // remove the square from the board
     const index = parseInt(square.id.slice(6))
+    board[Math.floor(index / size)][index % size] = 0
+    recolourEventCallbacks[index] = recolour.bind(null, index)
+    square.addEventListener("click", recolourEventCallbacks[index], false)
+    square.removeEventListener("click", removeEventCallbacks[index], false)
+    square.className = ''
 
     if (square.classList.contains('red')) {
         startPlaced = false
-        startButton.style.backgroundColor = 'rgb(255, 255, 255)';
+        startButton.style.backgroundColor = 'rgb(42, 42, 42)'
     }
 
     else if (square.classList.contains('blue')) {
         goalPlaced = false
-        goalButton.style.backgroundColor = 'rgb(255, 255, 255)';
+        goalButton.style.backgroundColor = 'rgb(42, 42, 42)'
     }
-
-    board[Math.floor(index / size)][index % size] = 0
-    recolourEventCallbacks[index] = recolour.bind(null, index);
-    square.addEventListener("click", recolourEventCallbacks[index], false)
-    square.removeEventListener("click", removeEventCallbacks[index], false);
-    square.className = ''
 }
 
-function calculate(algorithm) {
+function calculate() {
     adjacencyMatrix = []
+    let current
+    let path = []
+    let stackOrQueue = []
+    let visited = []
 
     // create the adjacency matrix
     for (let i = 0; i < size ** 2; i++) {
@@ -171,51 +166,25 @@ function calculate(algorithm) {
 
             // check for adjacent squares in all directions and add to adjacency matrix
             if (board[y][x] != 1) {
-                if (x != 0 && board[y][x - 1] != 1) {
-                    adjacencyMatrix[y * size + x][y * size + x - 1] = 1
-                    adjacencyMatrix[y*size + x - 1][y*size + x] = 1
+                adjacencies = []
+
+                for (let i = 0; i < 4; i++) {
+                    if (checks[i](x, y)) {
+                        adjacencies.push([y * size + x, y * size + x + (i == 0 ? -1 : i == 1 ? 1 : i == 2 ? size : -size)])
+                    }
                 }
 
-                if (x != size - 1 && board[y][x + 1] != 1) {
-                    adjacencyMatrix[y * size + x][y * size + x + 1] = 1
-                    adjacencyMatrix[y * size + x + 1][y * size + x] = 1
-                }
-
-                if (y != 0 && board[y - 1][x] != 1) {
-                    adjacencyMatrix[y * size + x][(y - 1) * size + x] = 1
-                    adjacencyMatrix[(y - 1) * size + x][y * size + x] = 1
-                }
-
-                if (y != size - 1 && board[y + 1][x] != 1) {
-                    adjacencyMatrix[y * size + x][(y + 1) * size + x] = 1
-                    adjacencyMatrix[(y + 1) * size + x][y * size + x] = 1
+                // fill out the adjacency matrix
+                while (adjacencies != 0) {
+                    adjacencyMatrix[adjacencies[0][0]][adjacencies[0][1]] = 1
+                    adjacencyMatrix[adjacencies[0][1]][adjacencies[0][0]] = 1
+                    adjacencies.shift()
                 }
             }
-
-            console.log('adjacent squares')
         }
     }
 
     // run chosen algorithm
-    switch (algorithm) {
-        case 'dfs':
-            dfs_bfs('dfs', adjacencyMatrix)
-            break
-
-        case 'bfs':
-            dfs_bfs('bfs', adjacencyMatrix)
-            break
-    }
-}
-
-// depth first search and breadth first search combined for simplicity
-function dfs_bfs(computeOrder, adjacencyMatrix) {
-    // initialise variables and arrays
-    let current
-    let path = []
-    let stackOrQueue = []
-    let visited = []
-
     for (let i = 0; i < size ** 2; i++) {
         visited[i] = false
     }
@@ -225,24 +194,13 @@ function dfs_bfs(computeOrder, adjacencyMatrix) {
 
     // different order of computation depending on algorithm
     while (stackOrQueue.length != 0) {
-        switch (computeOrder) {
-            case 'dfs':
-                current = stackOrQueue.pop()
-                break
-            
-            case 'bfs':
-                current = stackOrQueue.shift()
-                break
-        }
-        
-        // add to path and check if goal has been reached
+        current = algorithmFunctions[algorithm](stackOrQueue)
         path.push(current)
 
         if (current == goal) {
             break
         }
 
-        // visualise the path
         else if (current != start) {
             document.querySelector(`#square${current}`).classList.add('green')
         }
@@ -255,6 +213,4 @@ function dfs_bfs(computeOrder, adjacencyMatrix) {
             }
         }
     }
-
-    console.log(`path with ${computeOrder}: ${path}`)
 }
