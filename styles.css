@@ -1,14 +1,22 @@
 * {
     font-family: 'Inter', sans-serif;
+    color: rgb(160, 160, 160);
+    font-size: 3vh;
 }
 
 body {
     position: relative;
     display: flex;
+    background-color: rgb(42, 42, 42);
 }
 
 #options {
-    margin-right: 10vw;
+    margin-left: 2vh;
+    margin-right: 6vw;
+}
+
+h1 {
+    font-size: 5vh;
 }
 
 #canvas {
@@ -19,45 +27,45 @@ body {
     flex-wrap: wrap;
     position: relative;
     display: flex;
-    border: 2px solid black;
-    border-left: 1px solid black;
-    border-top: 1px solid black;
+    border: 2px solid rgb(160, 160, 160);
+    border-left: 1px solid rgb(160, 160, 160);
+    border-top: 1px solid rgb(160, 160, 160);
 }
 
 #canvas div {
-    border-left: 1px solid black;
-    border-top: 1px solid black;
+    border-left: 1px solid rgb(160, 160, 160);
+    border-top: 1px solid rgb(160, 160, 160);
 }
 
 .red {
-    background-color: red;
+    background-color: rgb(190, 65, 65);
 }
 
 .blue {
-    background-color: blue;
+    background-color: rgb(74, 74, 139);
 }
 
 .green {
-    background-color: rgb(47, 255, 0);
+    background-color: rgb(87, 170, 68);
 }
 
 .gray {
-    background-color: rgb(128, 128, 128);
+    background-color: rgb(160, 160, 160);
 }
 
 .blank {
-    background-color: white;
+    background-color: rgb(42, 42, 42);
 }
 
 .button {
-    border: 0;
+    border: 1px solid rgb(160, 160, 160);;
     outline: 0;
     cursor: pointer;
-    color: rgb(60, 66, 87);
-    background-color: rgb(255, 255, 255);
+    color: rgb(160, 160, 160);
+    background-color: rgb(42, 42, 42);
     box-shadow: rgb(0 0 0 / 0%) 0px 0px 0px 0px, rgb(0 0 0 / 0%) 0px 0px 0px 0px, rgb(0 0 0 / 12%) 0px 1px 1px 0px, rgb(60 66 87 / 16%) 0px 0px 0px 1px, rgb(0 0 0 / 0%) 0px 0px 0px 0px, rgb(0 0 0 / 0%) 0px 0px 0px 0px, rgb(60 66 87 / 8%) 0px 2px 5px 0px;
     border-radius: 4px;
-    font-size: 14px;
+    font-size: 2vh;
     font-weight: 500;
     padding: 4px 8px;
     display: inline-block;
@@ -67,5 +75,5 @@ body {
 
 .button:hover {
     box-shadow: rgb(0 0 0 / 0%) 0px 0px 0px 0px, rgb(0 0 0 / 0%) 0px 0px 0px 0px, rgb(0 0 0 / 12%) 0px 1px 1px 0px, rgb(60 66 87 / 16%) 0px 0px 0px 1px, rgb(0 0 0 / 0%) 0px 0px 0px 0px, rgb(60 66 87 / 8%) 0px 3px 9px 0px, rgb(60 66 87 / 8%) 0px 2px 5px 0px;
-    background-color: rgb(193, 195, 206);
+    background-color: rgb(69, 69, 69);
 }
