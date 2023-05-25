@@ -1,7 +1,6 @@
 * {
     font-family: 'Inter', sans-serif;
     color: rgb(160, 160, 160);
-    font-size: 3vh;
 }
 
 body {
@@ -12,20 +11,15 @@ body {
 
 #options {
     margin-left: 2vh;
-    margin-right: 6vw;
-}
-
-h1 {
-    font-size: 5vh;
+    margin-right: 8vw;
 }
 
 #canvas {
-    height: 92.5vh;
-    width: 92.5vh;
+    height: 56vw;
+    width: 56vw;
     margin-top: 2.5vh;
     margin-left: 2vw;
     flex-wrap: wrap;
-    position: relative;
     display: flex;
     border: 2px solid rgb(160, 160, 160);
     border-left: 1px solid rgb(160, 160, 160);
@@ -53,27 +47,17 @@ h1 {
     background-color: rgb(160, 160, 160);
 }
 
-.blank {
-    background-color: rgb(42, 42, 42);
-}
-
 .button {
-    border: 1px solid rgb(160, 160, 160);;
+    border: 1px solid rgb(160, 160, 160);
     outline: 0;
     cursor: pointer;
     color: rgb(160, 160, 160);
     background-color: rgb(42, 42, 42);
-    box-shadow: rgb(0 0 0 / 0%) 0px 0px 0px 0px, rgb(0 0 0 / 0%) 0px 0px 0px 0px, rgb(0 0 0 / 12%) 0px 1px 1px 0px, rgb(60 66 87 / 16%) 0px 0px 0px 1px, rgb(0 0 0 / 0%) 0px 0px 0px 0px, rgb(0 0 0 / 0%) 0px 0px 0px 0px, rgb(60 66 87 / 8%) 0px 2px 5px 0px;
     border-radius: 4px;
-    font-size: 2vh;
-    font-weight: 500;
+    font-size: 1.5vw;
     padding: 4px 8px;
-    display: inline-block;
-    min-height: 28px;
-    transition: background-color .24s,box-shadow .24s;
 }
 
 .button:hover {
-    box-shadow: rgb(0 0 0 / 0%) 0px 0px 0px 0px, rgb(0 0 0 / 0%) 0px 0px 0px 0px, rgb(0 0 0 / 12%) 0px 1px 1px 0px, rgb(60 66 87 / 16%) 0px 0px 0px 1px, rgb(0 0 0 / 0%) 0px 0px 0px 0px, rgb(60 66 87 / 8%) 0px 3px 9px 0px, rgb(60 66 87 / 8%) 0px 2px 5px 0px;
     background-color: rgb(69, 69, 69);
 }
