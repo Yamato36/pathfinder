@@ -4,7 +4,6 @@
 }
 
 body {
-    position: relative;
     display: flex;
     background-color: rgb(42, 42, 42);
 }
