@@ -1,62 +1,66 @@
+:root {
+    --red: rgb(190, 65, 65);
+    --blue: rgb(74, 74, 139);
+    --green: rgb(87, 170, 68);
+    --gray: rgb(160, 160, 160);
+    --dark: rgb(42, 42, 42);
+    --light: rgb(69, 69, 69);
+}
+
 * {
     font-family: 'Inter', sans-serif;
-    color: rgb(160, 160, 160);
+    color: var(--gray);
+    font-size: 1vw;
 }
 
 body {
     display: flex;
-    background-color: rgb(42, 42, 42);
-}
-
-#options {
-    margin-left: 2vh;
-    margin-right: 8vw;
-}
-
-#canvas {
-    height: 56vw;
-    width: 56vw;
-    margin-top: 2.5vh;
-    margin-left: 2vw;
-    flex-wrap: wrap;
-    display: flex;
-    border: 2px solid rgb(160, 160, 160);
-    border-left: 1px solid rgb(160, 160, 160);
-    border-top: 1px solid rgb(160, 160, 160);
-}
-
-#canvas div {
-    border-left: 1px solid rgb(160, 160, 160);
-    border-top: 1px solid rgb(160, 160, 160);
-}
-
-.red {
-    background-color: rgb(190, 65, 65);
-}
-
-.blue {
-    background-color: rgb(74, 74, 139);
-}
-
-.green {
-    background-color: rgb(87, 170, 68);
-}
-
-.gray {
-    background-color: rgb(160, 160, 160);
+    background-color: var(--dark);
 }
 
 .button {
-    border: 1px solid rgb(160, 160, 160);
+    border: 1px solid var(--gray);
     outline: 0;
     cursor: pointer;
-    color: rgb(160, 160, 160);
-    background-color: rgb(42, 42, 42);
+    color: var(--gray);
+    background-color: var(--dark);
     border-radius: 4px;
-    font-size: 1.5vw;
     padding: 4px 8px;
 }
 
 .button:hover {
-    background-color: rgb(69, 69, 69);
+    background-color: var(--light);
+}
+
+.blue {
+    background-color: var(--blue);
+}
+
+.gray {
+    background-color: var(--gray);
+}
+
+.green {
+    background-color: var(--green);
+}
+
+.red {
+    background-color: var(--red);
+}
+
+#canvas {
+    height: 48vw;
+    width: 48vw;
+    margin-left: 12vw;
+    margin-top: 2.5vh;
+    flex-wrap: wrap;
+    display: flex;
+    border: 2px solid var(--gray);
+    border-left: 1px solid var(--gray);
+    border-top: 1px solid var(--gray);
+}
+
+#canvas div {
+    border-left: 1px solid var(--gray);
+    border-top: 1px solid var(--gray);
 }
