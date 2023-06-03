@@ -1,8 +1,3 @@
-const algorithmFunctions = {
-    'dfs': (stackOrQueue) => stackOrQueue.pop(),
-    'bfs': (stackOrQueue) => stackOrQueue.shift()
-}
-
 const checks = [
     (x, y) => x != 0 && board[y][x - 1] != 'gray',
     (x, y) => x != size - 1 && board[y][x + 1] != 'gray',
@@ -10,11 +5,17 @@ const checks = [
     (x, y) => y != 0 && board[y - 1][x] != 'gray'
 ]
 
+const colours = {
+    'red': 'rgb(190, 65, 65)',
+    'blue': 'rgb(74, 74, 139)',
+    'gray': 'rgb(160, 160, 160)'
+}
+
 const goalButton = document.querySelector('#goal')
 const recolourEventCallbacks = []
 const removeEventCallbacks = []
 const sizeInput = document.querySelector('#size')
-const startButton = document.querySelector('#start')        
+const startButton = document.querySelector('#start') 
 
 let board
 let goal
@@ -23,19 +24,18 @@ let start
 let type = 'gray'
 
 sizeInput.addEventListener('change', () => {
+    canvas.innerHTML = ''
     goal = undefined
     size = parseInt(sizeInput.value)
     start = undefined
-    canvas.innerHTML = ''
     startButton.style.backgroundColor = goalButton.style.backgroundColor = 'var(--dark)'
-        
-    board = Array.from({ length: size }, () => Array(size).fill('blank'))
+    board = Array.from({ length: size }, () => Array(size).fill(undefined))
 
-    for (let i = 0; i < size ** 2; i++) {
+    for (let index = 0; index < size ** 2; index++) {
         const square = document.createElement('div')
-        recolourEventCallbacks[i] = recolour.bind(null, i)
-        square.addEventListener("click", recolourEventCallbacks[i], false)
-        square.setAttribute('id', `square${i}`)
+        recolourEventCallbacks[index] = recolour.bind(null, index, square)
+        square.addEventListener("click", recolourEventCallbacks[index], false)
+        square.setAttribute('id', `square${index}`)
         square.setAttribute('onmouseover', "this.style.cursor='pointer'")
         square.setAttribute('onmouseout', "this.style.cursor='default'")
         square.style.height = square.style.width = `calc(${48 / size}vw - 1px)`
@@ -44,15 +44,11 @@ sizeInput.addEventListener('change', () => {
 })
 
 startButton.addEventListener('click', () => {
-    if (!start) {
-        type = 'red'
-    }
+    if (!start) type = 'red'
 })
 
 goalButton.addEventListener('click', () => {
-    if (!goal) {
-        type = 'blue' 
-    }
+    if (!goal) type = 'blue' 
 })
 
 document.querySelector('#dfs').addEventListener('click', () => { 
@@ -63,45 +59,29 @@ document.querySelector('#bfs').addEventListener('click', () => {
     calculate('bfs') 
 })
 
-function recolour(index) {
-    // working with html classes to change the colour of the squares
-    if (type == 'red') {
-        start = index
-        startButton.style.backgroundColor = 'var(--light)'
-    }
+function recolour(index, square) {
+    if (type == 'red') { startButton.style.backgroundColor = 'var(--light)' }
+    else if (type == 'blue') { goalButton.style.backgroundColor = 'var(--light)' }
 
-    else if (type == 'blue') {
-        goal = index
-        goalButton.style.backgroundColor = 'var(--light)'
-    }
-
-    const square = document.querySelector(`#square${index}`)
-    removeEventCallbacks[index] = remove.bind(null, square)
+    removeEventCallbacks[index] = remove.bind(null, index, square, type)
+    board[Math.floor(index / size)][index % size] = type
     square.addEventListener("click", removeEventCallbacks[index], false)
     square.removeEventListener("click", recolourEventCallbacks[index], false)
-    square.className = ''
-    square.classList.add(type)
-    board[Math.floor(index / size)][index % size] = type
-    type = 'gray'
+    square.style.backgroundColor = colours[type]
+    type == 'red' ? start = index : type == 'blue' ? goal = index : null
+    type = 'gray' 
 }
 
-function remove(square, type) {
-    const index = parseInt(square.id.slice(6))
-    recolourEventCallbacks[index] = recolour.bind(null, index)
-    board[Math.floor(index / size)][index % size] = 'blank'
+function remove(index, square, type) {
+    if (type == 'red') { startButton.style.backgroundColor = 'var(--dark)' }
+    else if (type == 'blue') { goalButton.style.backgroundColor = 'var(--dark)' }
+
+    recolourEventCallbacks[index] = recolour.bind(null, index, square)
+    board[Math.floor(index / size)][index % size] = undefined
     square.addEventListener("click", recolourEventCallbacks[index], false)
     square.removeEventListener("click", removeEventCallbacks[index], false)
-    square.className = ''
-
-    if (type == 'red') {
-        start = undefined
-        startButton.style.backgroundColor = 'var(--dark)'
-    }
-
-    else if (type == 'blue') {
-        goal = undefined
-        goalButton.style.backgroundColor = 'var(--dark)'
-    }
+    square.style.backgroundColor = ''
+    type == 'red' ? start = undefined : type == 'red' ? goal = undefined : null
 }
 
 function calculate(algorithm) {
@@ -110,8 +90,11 @@ function calculate(algorithm) {
         const visited = Array(size ** 2).fill(false)
               visited[start] = true
         const path = []
+        const shortestPath = []
         const stackOrQueue = [start]
+
         let current
+        let previous = path[path.length - 2]
 
         for (let y = 0; y < size; y++) {
             for (let x = 0; x < size; x++) {
@@ -127,7 +110,6 @@ function calculate(algorithm) {
                         }
                     }
 
-                    // fill out the adjacency matrix
                     adjacencies.forEach(([a, b]) => {
                         adjacencyMatrix[a][b] = 1
                         adjacencyMatrix[b][a] = 1
@@ -138,15 +120,23 @@ function calculate(algorithm) {
 
         // dfs or bfs
         while (stackOrQueue.length != 0) {
-            current = algorithmFunctions[algorithm](stackOrQueue)
+            current = algorithm == 'dfs' ? stackOrQueue.pop() : stackOrQueue.shift()
             path.push(current)
 
             if (current == goal) {
-                return path // not used
-            }
+                previous = path[path.length - 1]
+                shortestPath.push(path[path.length - 1])
 
-            else if (current != start) {
-                document.querySelector(`#square${current}`).classList.add('green')
+                // backtracking
+                for (let i = path.length - 1; i > -1; i--) {
+                    if (adjacencyMatrix[path[i]][previous] == 1) {
+                        shortestPath.push(path[i])
+                        previous = path[i]
+                        document.querySelector(`#square${path[i]}`).classList.add('green')
+                    }
+                }
+
+                return shortestPath // not used
             }
 
             for (let i = 0; i < size ** 2; i++) {
