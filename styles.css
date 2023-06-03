@@ -1,28 +1,24 @@
 :root {
-    --red: rgb(190, 65, 65);
-    --blue: rgb(74, 74, 139);
-    --green: rgb(87, 170, 68);
-    --gray: rgb(160, 160, 160);
+    --border: 1px solid rgb(160, 160, 160);
     --dark: rgb(42, 42, 42);
     --light: rgb(69, 69, 69);
 }
 
 * {
     font-family: 'Inter', sans-serif;
-    color: var(--gray);
+    color: rgb(160, 160, 160);
     font-size: 1vw;
 }
 
-body {
+body {  
     display: flex;
     background-color: var(--dark);
 }
 
 .button {
-    border: 1px solid var(--gray);
-    outline: 0;
+    border: var(--border);
     cursor: pointer;
-    color: var(--gray);
+    color: rgb(160, 160, 160);
     background-color: var(--dark);
     border-radius: 4px;
     padding: 4px 8px;
@@ -32,35 +28,23 @@ body {
     background-color: var(--light);
 }
 
-.blue {
-    background-color: var(--blue);
-}
-
-.gray {
-    background-color: var(--gray);
-}
-
 .green {
-    background-color: var(--green);
-}
-
-.red {
-    background-color: var(--red);
+    background-color: rgb(87, 170, 68);
 }
 
 #canvas {
     height: 48vw;
-    width: 48vw;
+    width:  48vw;
     margin-left: 12vw;
     margin-top: 2.5vh;
     flex-wrap: wrap;
     display: flex;
-    border: 2px solid var(--gray);
-    border-left: 1px solid var(--gray);
-    border-top: 1px solid var(--gray);
+    border: 2px solid rgb(160, 160, 160);
+    border-left: var(--border);
+    border-top: var(--border);
 }
 
 #canvas div {
-    border-left: 1px solid var(--gray);
-    border-top: 1px solid var(--gray);
+    border-left: var(--border);
+    border-top: var(--border);
 }
