@@ -1,12 +1,12 @@
 :root {
-    --border: 1px solid rgb(160, 160, 160);
+    --gray: rgb(160, 160, 160);
     --dark: rgb(42, 42, 42);
     --light: rgb(69, 69, 69);
 }
 
 * {
     font-family: 'Inter', sans-serif;
-    color: rgb(160, 160, 160);
+    color: var(--gray);
     font-size: 1vw;
 }
 
@@ -18,7 +18,7 @@ body {
 .button {
     border: var(--border);
     cursor: pointer;
-    color: rgb(160, 160, 160);
+    color: var(--gray);
     background-color: var(--dark);
     border-radius: 4px;
     padding: 4px 8px;
@@ -39,12 +39,10 @@ body {
     margin-top: 2.5vh;
     flex-wrap: wrap;
     display: flex;
-    border: 2px solid rgb(160, 160, 160);
-    border-left: var(--border);
-    border-top: var(--border);
+    border: 2px solid var(--gray);
 }
 
 #canvas div {
-    border-left: var(--border);
-    border-top: var(--border);
+    box-sizing:border-box;
+    border: 1px solid var(--gray);
 }
