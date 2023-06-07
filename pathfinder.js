@@ -17,10 +17,7 @@ const removeEventCallbacks = []
 const sizeInput = document.querySelector('#size')
 const startButton = document.querySelector('#start') 
 
-let board
-let goal
-let size
-let start
+let board, goal, size, start;
 let type = 'gray'
 
 sizeInput.addEventListener('change', () => {
@@ -38,7 +35,7 @@ sizeInput.addEventListener('change', () => {
         square.setAttribute('id', `square${index}`)
         square.setAttribute('onmouseover', "this.style.cursor='pointer'")
         square.setAttribute('onmouseout', "this.style.cursor='default'")
-        square.style.height = square.style.width = `calc(${48 / size}vw - 1px)`
+        square.style.height = square.style.width = `calc(${48 / size}vw)`
         document.querySelector('#canvas').appendChild(square)
     }
 })
@@ -51,13 +48,9 @@ goalButton.addEventListener('click', () => {
     if (!goal) type = 'blue' 
 })
 
-document.querySelector('#dfs').addEventListener('click', () => { 
-    calculate('dfs') 
-})
+document.querySelector('#dfs').addEventListener('click', () => calculate('dfs'))
 
-document.querySelector('#bfs').addEventListener('click', () => { 
-    calculate('bfs') 
-})
+document.querySelector('#bfs').addEventListener('click', () => calculate('bfs'))
 
 function recolour(index, square) {
     if (type == 'red') { startButton.style.backgroundColor = 'var(--light)' }
@@ -105,9 +98,8 @@ function calculate(algorithm) {
 
                     // check for adjacent squares in all directions and add to adjacency matrix
                     for (let i = 0; i < 4; i++) {
-                        if (checks[i](x, y)) {
+                        if (checks[i](x, y))
                             adjacencies.push([y * size + x, y * size + x + (i == 0 ? -1 : i == 1 ? 1 : i == 2 ? size : -size)])
-                        }
                     }
 
                     adjacencies.forEach(([a, b]) => {
@@ -140,10 +132,8 @@ function calculate(algorithm) {
             }
 
             for (let i = 0; i < size ** 2; i++) {
-                if (adjacencyMatrix[current][i] == 1 && visited[i] == false) {
-                    stackOrQueue.push(i)
-                    visited[i] = true
-                }
+                if (adjacencyMatrix[current][i] == 1 && visited[i] == false)
+                    visited[stackOrQueue.push(i)] = true
             }
         }
     }
